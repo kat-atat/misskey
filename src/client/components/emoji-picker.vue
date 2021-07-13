@@ -132,7 +132,7 @@ export default defineComponent({
 			const q = this.q.replace(/:/g, '');
 
 			const searchCustom = () => {
-				const max = 32;
+				const max = Infinity;
 				const emojis = this.customEmojis;
 				const matches = new Set();
 
