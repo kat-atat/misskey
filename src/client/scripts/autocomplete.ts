@@ -236,12 +236,12 @@ export class Autocomplete {
 			const after = source.substr(caret);
 
 			// 挿入
-			this.text = trimmedBefore + value + after;
+			this.text = trimmedBefore + value + " " + after;
 
 			// キャレットを戻す
 			this.vm.$nextTick(() => {
 				this.textarea.focus();
-				const pos = trimmedBefore.length + value.length;
+				const pos = trimmedBefore.length + (value.length + 1);
 				this.textarea.setSelectionRange(pos, pos);
 			});
 		}
