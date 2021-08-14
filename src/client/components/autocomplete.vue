@@ -282,17 +282,27 @@ export default defineComponent({
 			} else if (this.type == 'emoji') {
 				if (this.q.length < 2) return this.emojis = [];
 
-				const limit = 30;
-				const matched = this.emojiDb.filter(x => !x.aliasOf && x.name.includes(this.q));
-				const common = matched.filter(x => !x.isCustomEmoji);
-				const custom = matched.filter(x => x.isCustomEmoji)
-				.sort((a, b) => {
-					var textA = a.name.toUpperCase();
-					var textB = b.name.toUpperCase();
-					return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-				});
+				const matched = [];
+				const max = 30;
 
-				this.emojis = [...custom, ...common].slice(0, limit);
+				this.emojiDb.some(x => {
+					if (x.name.startsWith(this.q) && !x.aliasOf && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
+					return matched.length == max;
+				});
+				if (matched.length < max) {
+					this.emojiDb.some(x => {
+						if (x.name.startsWith(this.q) && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
+						return matched.length == max;
+					});
+				}
+				if (matched.length < max) {
+					this.emojiDb.some(x => {
+						if (x.name.includes(this.q) && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
+						return matched.length == max;
+					});
+				}
+
+				this.emojis = matched;
 			}
 		},
 
