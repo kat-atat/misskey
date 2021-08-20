@@ -104,6 +104,7 @@ for (const x of customEmojis) {
 emojiDefinitions.sort((a, b) => a.name.length - b.name.length);
 
 const emojiDb = markRaw(emojiDefinitions.concat(emjdb));
+const emojiDb_custom = markRaw(emojiDefinitions);
 //#endregion
 
 export default defineComponent({
@@ -296,13 +297,13 @@ export default defineComponent({
 				const matched = [];
 				const max = 30;
 
-				emojiDb.some(x => {
-					if (x.name.startsWith(this.q) && !x.aliasOf && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
+				emojiDb_custom.some(x => {
+					if (x.aliasOf && x.name.startsWith(this.q) && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
 					return matched.length == max;
 				});
 				if (matched.length < max) {
-					emojiDb.some(x => {
-						if (x.name.startsWith(this.q) && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
+					emojiDb_custom.some(x => {
+						if (!x.aliasOf && x.name.startsWith(this.q) && !matched.some(y => y.emoji == x.emoji)) matched.push(x);
 						return matched.length == max;
 					});
 				}
