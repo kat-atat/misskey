@@ -772,6 +772,9 @@ searchResult: "Результаты поиска"
 hashtags: "Хэштег"
 troubleshooting: "Разрешение проблем"
 useBlurEffect: "Размытие в интерфейсе"
+learnMore: "Подробнее"
+misskeyUpdated: "Misskey обновился!"
+whatIsNew: "Что новенького?"
 _docs:
   continueReading: "Читать подробнее"
   features: "Возможности"
@@ -1145,6 +1148,7 @@ _widgets:
   jobQueue: "Очередь заданий"
   serverMetric: "Показатели сервера"
   aiscript: "Консоль AiScript"
+  aichan: "Ай"
 _cw:
   hide: "Спрятать"
   show: "Показать еще"
