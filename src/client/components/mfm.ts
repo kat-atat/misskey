@@ -11,6 +11,7 @@ import MkGoogle from '@client/components/google.vue';
 import MkSparkle from '@client/components/sparkle.vue';
 import MkA from '@client/components/global/a.vue';
 import { host } from '@client/config';
+import { fnNameList } from '@/mfm/fn-name-list';
 
 export default defineComponent({
 	props: {
@@ -46,7 +47,7 @@ export default defineComponent({
 	render() {
 		if (this.text == null || this.text == '') return;
 
-		const ast = (this.plain ? mfm.parsePlain : mfm.parse)(this.text);
+		const ast = (this.plain ? mfm.parsePlain : mfm.parse)(this.text, { fnNameList });
 
 		const validTime = (t: string | null | undefined) => {
 			if (t == null) return null;
@@ -185,7 +186,7 @@ export default defineComponent({
 						}
 					}
 					if (style == null) {
-						return h('span', {}, ['[', token.props.name, ' ', ...genEl(token.children), ']']);
+						return h('span', {}, ['$[', token.props.name, ' ', ...genEl(token.children), ']']);
 					} else {
 						return h('span', {
 							style: 'display: inline-block;' + style,

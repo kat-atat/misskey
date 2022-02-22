@@ -112,7 +112,7 @@ export class UserRepository extends Repository<User> {
 
 		const unread = channels.length > 0 ? await NoteUnreads.findOne({
 			userId: userId,
-			noteChannelId: In(channels.map(x => x.id)),
+			noteChannelId: In(channels.map(x => x.followeeId)),
 		}) : null;
 
 		return unread != null;
@@ -155,6 +155,14 @@ export class UserRepository extends Repository<User> {
 		);
 	}
 
+	public getAvatarUrl(user: User): string {
+		if (user.avatarUrl) {
+			return user.avatarUrl;
+		} else {
+			return `${config.url}/random-avatar/${user.id}`;
+		}
+	}
+
 	public async pack(
 		src: User['id'] | User,
 		me?: { id: User['id'] } | null | undefined,
@@ -179,6 +187,16 @@ export class UserRepository extends Repository<User> {
 			.getMany() : [];
 		const profile = opts.detail ? await UserProfiles.findOneOrFail(user.id) : null;
 
+		const followingCount = profile == null ? null :
+			(profile.ffVisibility === 'public') || (meId === user.id) ? user.followingCount :
+			(profile.ffVisibility === 'followers') && (relation!.isFollowing) ? user.followingCount :
+			null;
+
+		const followersCount = profile == null ? null :
+			(profile.ffVisibility === 'public') || (meId === user.id) ? user.followersCount :
+			(profile.ffVisibility === 'followers') && (relation!.isFollowing) ? user.followersCount :
+			null;
+
 		const falsy = opts.detail ? false : undefined;
 
 		const packed = {
@@ -186,7 +204,7 @@ export class UserRepository extends Repository<User> {
 			name: user.name,
 			username: user.username,
 			host: user.host,
-			avatarUrl: user.avatarUrl ? user.avatarUrl : config.url + '/avatar/' + user.id,
+			avatarUrl: this.getAvatarUrl(user),
 			avatarBlurhash: user.avatarBlurhash,
 			avatarColor: null, // 後方互換性のため
 			isAdmin: user.isAdmin || falsy,
@@ -222,8 +240,8 @@ export class UserRepository extends Repository<User> {
 				birthday: profile!.birthday,
 				lang: profile!.lang,
 				fields: profile!.fields,
-				followersCount: user.followersCount,
-				followingCount: user.followingCount,
+				followersCount: followersCount || 0,
+				followingCount: followingCount || 0,
 				notesCount: user.notesCount,
 				pinnedNoteIds: pins.map(pin => pin.noteId),
 				pinnedNotes: Notes.packMany(pins.map(pin => pin.note!), me, {
@@ -231,6 +249,8 @@ export class UserRepository extends Repository<User> {
 				}),
 				pinnedPageId: profile!.pinnedPageId,
 				pinnedPage: profile!.pinnedPageId ? Pages.pack(profile!.pinnedPageId, me) : null,
+				publicReactions: profile!.publicReactions,
+				ffVisibility: profile!.ffVisibility,
 				twoFactorEnabled: profile!.twoFactorEnabled,
 				usePasswordLessLogin: profile!.usePasswordLessLogin,
 				securityKeys: profile!.twoFactorEnabled

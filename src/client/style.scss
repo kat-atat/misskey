@@ -1,7 +1,6 @@
 @charset "utf-8";
 
 :root {
-	--baseContentWidth: 760px;
 	--radius: 12px;
 	--marginFull: 16px;
 	--marginHalf: 10px;
@@ -202,6 +201,20 @@ hr {
 	}
 }
 
+._buttonGradate {
+	@extend ._buttonPrimary;
+	color: var(--fgOnAccent);
+	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+
+	&:not(:disabled):hover {
+		background: linear-gradient(90deg, var(--X8), var(--X8));
+	}
+
+	&:not(:disabled):active {
+		background: linear-gradient(90deg, var(--X8), var(--X8));
+	}
+}
+
 ._help {
 	color: var(--accent);
 	cursor: help
@@ -336,21 +349,6 @@ hr {
 }
 
 // TODO: 廃止
-._root {
-	box-sizing: border-box;
-	margin: var(--root-margin, 32px) auto;
-	max-width: min(var(--baseContentWidth), calc(100% - (var(--root-margin, 32px) * 2)));
-
-	// 子marginが突き抜けるのを防ぐため
-	// https://stackoverflow.com/questions/1762539/margin-on-child-element-moves-parent-element
-	padding-top: 1px;
-	margin-top: calc(var(--root-margin, 32px) - 1px);
-
-	@media (max-width: 500px) {
-		--root-margin: 10px;
-	}
-}
-
 ._monolithic_ {
 	._section:not(:empty) {
 		box-sizing: border-box;
@@ -362,33 +360,6 @@ hr {
 	
 		& + ._section:not(:empty) {
 			border-top: solid 0.5px var(--divider);
-		}
-	}
-}
-
-._flat_ {
-	--root-margin: 0px;
-	--baseContentWidth: 100%;
-	--panelBorder: none;
-
-	._block {
-		//border-top: solid 0.5px var(--divider);
-		//border-bottom: solid 0.5px var(--divider);
-		border-radius: 0;
-		box-shadow: none;
-	}
-
-	._isolated {
-		margin: var(--margin);
-	}
-
-	._block._isolated {
-		border-radius: var(--radius);
-	}
-
-	@media (max-width: 500px) {
-		._root {
-			--root-margin: 0px;
 		}
 	}
 }
@@ -509,7 +480,7 @@ hr {
 	padding: 5px;
 }
 
-.prism-editor__textarea:focus-visible {
+.prism-editor__textarea:focus {
 	outline: none;
 }
 

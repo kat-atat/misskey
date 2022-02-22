@@ -1,5 +1,6 @@
 <template>
 <div class="rrevdjwt" :class="{ center: align === 'center' }"
+	:style="{ width: width ? width + 'px' : null }"
 	ref="items"
 	@contextmenu.self="e => e.preventDefault()"
 	v-hotkey="keymap"
@@ -27,7 +28,7 @@
 			<MkAvatar :user="item.user" class="avatar"/><MkUserName :user="item.user"/>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</button>
-		<button v-else @click="clicked(item.action, $event)" :tabindex="i" class="_button item" :class="{ danger: item.danger }">
+		<button v-else @click="clicked(item.action, $event)" :tabindex="i" class="_button item" :class="{ danger: item.danger, active: item.active }" :disabled="item.active">
 			<i v-if="item.icon" class="fa-fw" :class="item.icon"></i>
 			<MkAvatar v-if="item.avatar" :user="item.avatar" class="avatar"/>
 			<span>{{ item.text }}</span>
@@ -58,6 +59,10 @@ export default defineComponent({
 		align: {
 			type: String,
 			requried: false
+		},
+		width: {
+			type: Number,
+			required: false
 		},
 	},
 	emits: ['close'],
@@ -142,6 +147,8 @@ export default defineComponent({
 .rrevdjwt {
 	padding: 8px 0;
 	min-width: 200px;
+	max-height: 90vh;
+	overflow: auto;
 
 	&.center {
 		> .item {
@@ -152,7 +159,7 @@ export default defineComponent({
 	> .item {
 		display: block;
 		position: relative;
-		padding: 8px 16px;
+		padding: 8px 18px;
 		width: 100%;
 		box-sizing: border-box;
 		white-space: nowrap;
@@ -175,6 +182,10 @@ export default defineComponent({
 			border-radius: 6px;
 		}
 
+		> * {
+			position: relative;
+		}
+
 		&.danger {
 			color: #ff2a2a;
 
@@ -195,18 +206,22 @@ export default defineComponent({
 			}
 		}
 
-		&:hover {
+		&.active {
+			color: var(--fgOnAccent);
+			opacity: 1;
+
+			&:before {
+				background: var(--accent);
+			}
+		}
+
+		&:not(:disabled):hover {
 			color: var(--accent);
 			text-decoration: none;
 
 			&:before {
 				background: var(--accentedBg);
 			}
-		}
-
-		&:active {
-			//color: var(--fgOnAccent);
-			//background: var(--accentDarken);
 		}
 
 		&:not(:active):focus-visible {
@@ -234,12 +249,12 @@ export default defineComponent({
 		}
 
 		> i {
-			margin-right: 4px;
+			margin-right: 5px;
 			width: 20px;
 		}
 
 		> .avatar {
-			margin-right: 4px;
+			margin-right: 5px;
 			width: 20px;
 			height: 20px;
 		}

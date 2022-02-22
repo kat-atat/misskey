@@ -5,6 +5,19 @@
 		<FormSwitch v-model="autoAcceptFollowed" :disabled="!isLocked" @update:modelValue="save()">{{ $ts.autoAcceptFollowed }}</FormSwitch>
 		<template #caption>{{ $ts.lockedAccountInfo }}</template>
 	</FormGroup>
+	<FormSwitch v-model="publicReactions" @update:modelValue="save()">
+		{{ $ts.makeReactionsPublic }}
+		<template #desc>{{ $ts.makeReactionsPublicDescription }}</template>
+	</FormSwitch>
+	<FormGroup>
+		<template #label>{{ $ts.ffVisibility }}</template>
+		<FormSelect v-model="ffVisibility">
+			<option value="public">{{ $ts._ffVisibility.public }}</option>
+			<option value="followers">{{ $ts._ffVisibility.followers }}</option>
+			<option value="private">{{ $ts._ffVisibility.private }}</option>
+		</FormSelect>
+		<template #caption>{{ $ts.ffVisibilityDescription }}</template>
+	</FormGroup>
 	<FormSwitch v-model="hideOnlineStatus" @update:modelValue="save()">
 		{{ $ts.hideOnlineStatus }}
 		<template #desc>{{ $ts.hideOnlineStatusDescription }}</template>
@@ -64,6 +77,8 @@ export default defineComponent({
 			noCrawle: false,
 			isExplorable: false,
 			hideOnlineStatus: false,
+			publicReactions: false,
+			ffVisibility: 'public',
 		}
 	},
 
@@ -80,6 +95,8 @@ export default defineComponent({
 		this.noCrawle = this.$i.noCrawle;
 		this.isExplorable = this.$i.isExplorable;
 		this.hideOnlineStatus = this.$i.hideOnlineStatus;
+		this.publicReactions = this.$i.publicReactions;
+		this.ffVisibility = this.$i.ffVisibility;
 	},
 
 	mounted() {
@@ -94,6 +111,8 @@ export default defineComponent({
 				noCrawle: !!this.noCrawle,
 				isExplorable: !!this.isExplorable,
 				hideOnlineStatus: !!this.hideOnlineStatus,
+				publicReactions: !!this.publicReactions,
+				ffVisibility: this.ffVisibility,
 			});
 		}
 	}

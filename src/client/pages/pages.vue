@@ -1,5 +1,6 @@
 <template>
-<div>
+<MkSpacer>
+	<!-- TODO: MkHeaderに統合 -->
 	<MkTab v-model="tab" v-if="$i">
 		<option value="featured"><i class="fas fa-fire-alt"></i> {{ $ts._pages.featured }}</option>
 		<option value="my"><i class="fas fa-edit"></i> {{ $ts._pages.my }}</option>
@@ -26,7 +27,7 @@
 			</MkPagination>
 		</div>
 	</div>
-</div>
+</MkSpacer>
 </template>
 
 <script lang="ts">
@@ -46,11 +47,12 @@ export default defineComponent({
 			[symbols.PAGE_INFO]: {
 				title: this.$ts.pages,
 				icon: 'fas fa-sticky-note',
+				bg: 'var(--bg)',
 				actions: [{
 					icon: 'fas fa-plus',
 					text: this.$ts.create,
-					handler: this.create
-				}]
+					handler: this.create,
+				}],
 			},
 			tab: 'featured',
 			featuredPagesPagination: {

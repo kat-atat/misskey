@@ -1,5 +1,5 @@
 <template>
-<div class="cmuxhskf" v-hotkey.global="keymap" v-size="{ min: [800] }">
+<div class="cmuxhskf" v-size="{ min: [800] }" v-hotkey.global="keymap">
 	<XTutorial v-if="$store.reactiveState.tutorial.value != -1" class="tutorial _block"/>
 	<XPostForm v-if="$store.reactiveState.showFixedPostForm.value" class="post-form _block" fixed/>
 
@@ -84,7 +84,7 @@ export default defineComponent({
 					icon: 'fas fa-globe',
 					iconOnly: true,
 					onClick: () => { this.src = 'global'; this.saveSrc(); },
-				}]
+				}],
 			})),
 		};
 	},
@@ -129,7 +129,7 @@ export default defineComponent({
 		},
 
 		top() {
-			scroll(this.$el, 0);
+			scroll(this.$el, { top: 0 });
 		},
 
 		async chooseList(ev) {
@@ -205,6 +205,10 @@ export default defineComponent({
 			padding: 8px 16px;
 			border-radius: 32px;
 		}
+	}
+
+	> .post-form {
+		border-radius: var(--radius);
 	}
 
 	> .tl {
