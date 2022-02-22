@@ -6,7 +6,7 @@
 		<main ref="main">
 			<div class="content">
 				<MkStickyContainer>
-					<template #header><MkHeader v-if="pageInfo && !pageInfo.hideHeader" :info="pageInfo"/></template>
+					<template #header><XHeader v-if="pageInfo && !pageInfo.hideHeader" :info="pageInfo" :back-button="true" @back="back()"/></template>
 					<router-view v-slot="{ Component }">
 						<transition :name="$store.state.animation ? 'page' : ''" mode="out-in" @enter="onTransition">
 							<keep-alive :include="['timeline']">
@@ -56,6 +56,7 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { instanceName } from '@client/config';
 import { StickySidebar } from '@client/scripts/sticky-sidebar';
+import XHeader from './header.vue';
 import XSidebar from '@client/ui/_common_/sidebar.vue';
 import XCommon from '../_common_/common.vue';
 import XSide from '../classic.side.vue';
@@ -68,6 +69,7 @@ const DESKTOP_THRESHOLD = 1100;
 export default defineComponent({
 	components: {
 		XCommon,
+		XHeader,
 		XSidebar,
 		XWidgets: defineAsyncComponent(() => import('./widgets.vue')),
 		XSide, // NOTE: dynamic importするとAsyncComponentWrapperが間に入るせいでref取得できなくて面倒になる
