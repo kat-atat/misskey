@@ -205,6 +205,13 @@ export const menuDef = {
 					unisonReload();
 				}
 			}, {
+				text: 'sunisky',
+				active: ui === 'sunisky',
+				action: () => {
+					localStorage.setItem('ui', 'sunisky');
+					unisonReload();
+				}
+			}, {
 				text: 'Chat (β)',
 				active: ui === 'chat',
 				action: () => {

@@ -189,6 +189,7 @@ const app = createApp(await (
 	!$i                               ? import('@client/ui/visitor.vue') :
 	ui === 'deck'                     ? import('@client/ui/deck.vue') :
 	ui === 'desktop'                  ? import('@client/ui/desktop.vue') :
+	ui === 'sunisky'                  ? import('@client/ui/sunisky/index.vue') :
 	ui === 'chat'                     ? import('@client/ui/chat/index.vue') :
 	ui === 'classic'                  ? import('@client/ui/classic.vue') :
 	import('@client/ui/universal.vue')
