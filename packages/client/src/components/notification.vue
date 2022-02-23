@@ -1,5 +1,5 @@
 <template>
-<div class="qglefbjs" :class="notification.type" v-size="{ max: [500, 600] }" ref="elRef">
+<div ref="elRef" v-size="{ max: [500, 600] }" class="qglefbjs" :class="notification.type">
 	<div class="head">
 		<MkAvatar v-if="notification.user" class="icon" :user="notification.user"/>
 		<img v-else-if="notification.icon" class="icon" :src="notification.icon" alt=""/>
@@ -15,22 +15,18 @@
 			<i v-else-if="notification.type === 'pollVote'" class="fas fa-poll-h"></i>
 			<!-- notification.reaction が null になることはまずないが、ここでoptional chaining使うと一部ブラウザで刺さるので念の為 -->
 			<XReactionIcon v-else-if="notification.type === 'reaction'"
+				ref="reactionRef"
 				:reaction="notification.reaction ? notification.reaction.replace(/^:(\w+):$/, ':$1@.:') : notification.reaction"
 				:custom-emojis="notification.note.emojis"
 				:no-style="true"
-				@touchstart.passive="onReactionMouseover"
-				@mouseover="onReactionMouseover"
-				@mouseleave="onReactionMouseleave"
-				@touchend="onReactionMouseleave"
-				ref="reactionRef"
 			/>
 		</div>
 	</div>
 	<div class="tail">
 		<header>
-			<MkA v-if="notification.user" class="name" :to="userPage(notification.user)" v-user-preview="notification.user.id"><MkUserName :user="notification.user"/></MkA>
+			<MkA v-if="notification.user" v-user-preview="notification.user.id" class="name" :to="userPage(notification.user)"><MkUserName :user="notification.user"/></MkA>
 			<span v-else>{{ notification.header }}</span>
-			<MkTime :time="notification.createdAt" v-if="withTime" class="time"/>
+			<MkTime v-if="withTime" :time="notification.createdAt" class="time"/>
 		</header>
 		<MkA v-if="notification.type === 'reaction'" class="text" :to="notePage(notification.note)" :title="getNoteSummary(notification.note)">
 			<i class="fas fa-quote-left"></i>
@@ -69,14 +65,16 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import * as misskey from 'misskey-js';
 import { getNoteSummary } from '@/scripts/get-note-summary';
 import XReactionIcon from './reaction-icon.vue';
 import MkFollowButton from './follow-button.vue';
 import XReactionTooltip from './reaction-tooltip.vue';
-import notePage from '@/filters/note';
+import { notePage } from '@/filters/note';
 import { userPage } from '@/filters/user';
 import { i18n } from '@/i18n';
 import * as os from '@/os';
+import { useTooltip } from '@/scripts/use-tooltip';
 
 export default defineComponent({
 	components: {
@@ -105,28 +103,25 @@ export default defineComponent({
 		const reactionRef = ref(null);
 
 		onMounted(() => {
-			let readObserver: IntersectionObserver = null;
-			let connection = null;
-
 			if (!props.notification.isRead) {
-				readObserver = new IntersectionObserver((entries, observer) => {
+				const readObserver = new IntersectionObserver((entries, observer) => {
 					if (!entries.some(entry => entry.isIntersecting)) return;
 					os.stream.send('readNotification', {
 						id: props.notification.id
 					});
-					entries.map(({ target }) => observer.unobserve(target));
+					observer.disconnect();
 				});
 
 				readObserver.observe(elRef.value);
 
-				connection = os.stream.useChannel('main');
-				connection.on('readAllNotifications', () => readObserver.unobserve(elRef.value));
-			}
+				const connection = os.stream.useChannel('main');
+				connection.on('readAllNotifications', () => readObserver.disconnect());
 
-			onUnmounted(() => {
-				if (readObserver) readObserver.unobserve(elRef.value);
-				if (connection) connection.dispose();
-			});
+				onUnmounted(() => {
+					readObserver.disconnect();
+					connection.dispose();
+				});
+			}
 		});
 
 		const followRequestDone = ref(false);
@@ -152,50 +147,17 @@ export default defineComponent({
 			os.api('users/groups/invitations/reject', { invitationId: props.notification.invitation.id });
 		};
 
-		let isReactionHovering = false;
-		let reactionTooltipTimeoutId;
-
-		const onReactionMouseover = () => {
-			if (isReactionHovering) return;
-			isReactionHovering = true;
-			reactionTooltipTimeoutId = setTimeout(openReactionTooltip, 300);
-		};
-
-		const onReactionMouseleave = () => {
-			if (!isReactionHovering) return;
-			isReactionHovering = false;
-			clearTimeout(reactionTooltipTimeoutId);
-			closeReactionTooltip();
-		};
-
-		let changeReactionTooltipShowingState: () => void;
-
-		const openReactionTooltip = () => {
-			closeReactionTooltip();
-			if (!isReactionHovering) return;
-
-			const showing = ref(true);
+		useTooltip(reactionRef, (showing) => {
 			os.popup(XReactionTooltip, {
 				showing,
 				reaction: props.notification.reaction ? props.notification.reaction.replace(/^:(\w+):$/, ':$1@.:') : props.notification.reaction,
 				emojis: props.notification.note.emojis,
 				source: reactionRef.value.$el,
 			}, {}, 'closed');
-
-			changeReactionTooltipShowingState = () => {
-				showing.value = false;
-			};
-		};
-
-		const closeReactionTooltip = () => {
-			if (changeReactionTooltipShowingState != null) {
-				changeReactionTooltipShowingState();
-				changeReactionTooltipShowingState = null;
-			}
-		};
+		});
 
 		return {
-			getNoteSummary: (text: string) => getNoteSummary(text, i18n.locale),
+			getNoteSummary: (note: misskey.entities.Note) => getNoteSummary(note),
 			followRequestDone,
 			groupInviteDone,
 			notePage,
@@ -204,8 +166,6 @@ export default defineComponent({
 			rejectFollowRequest,
 			acceptGroupInvitation,
 			rejectGroupInvitation,
-			onReactionMouseover,
-			onReactionMouseleave,
 			elRef,
 			reactionRef,
 		};

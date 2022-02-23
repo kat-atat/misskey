@@ -19,15 +19,16 @@ export default class extends Channel {
 	@autobind
 	public async onMessage(type: string, body: any) {
 		switch (type) {
-			case 'ping':
+			case 'ping': {
 				if (body.id == null) return;
 				const matching = await ReversiMatchings.findOne({
 					parentId: this.user!.id,
-					childId: body.id
+					childId: body.id,
 				});
 				if (matching == null) return;
 				publishMainStream(matching.childId, 'reversiInvited', await ReversiMatchings.pack(matching, { id: matching.childId }));
 				break;
+			}
 		}
 	}
 }

@@ -3,10 +3,10 @@ const types = require('pg').types;
 types.setTypeParser(20, Number);
 
 import { createConnection, Logger, getConnection } from 'typeorm';
-import config from '@/config/index';
-import { entities as charts } from '@/services/chart/entities';
-import { dbLogger } from './logger';
 import * as highlight from 'cli-highlight';
+import config from '@/config/index';
+
+import { dbLogger } from './logger';
 
 import { User } from '@/models/entities/user';
 import { DriveFile } from '@/models/entities/drive-file';
@@ -73,6 +73,8 @@ import { RegistryItem } from '@/models/entities/registry-item';
 import { Ad } from '@/models/entities/ad';
 import { PasswordResetRequest } from '@/models/entities/password-reset-request';
 import { UserPending } from '@/models/entities/user-pending';
+
+import { entities as charts } from '@/services/chart/entities';
 
 const sqlLogger = dbLogger.createSubLogger('sql', 'white', false);
 
@@ -175,7 +177,7 @@ export const entities = [
 	Ad,
 	PasswordResetRequest,
 	UserPending,
-	...charts as any
+	...charts,
 ];
 
 export function initDb(justBorrow = false, sync = false, forceRecreate = false) {
@@ -205,21 +207,37 @@ export function initDb(justBorrow = false, sync = false, forceRecreate = false) 
 				port: config.redis.port,
 				password: config.redis.pass,
 				prefix: `${config.redis.prefix}:query:`,
-				db: config.redis.db || 0
-			}
+				db: config.redis.db || 0,
+			},
 		} : false,
 		logging: log,
 		logger: log ? new MyCustomLogger() : undefined,
-		entities: entities
+		entities: entities,
 	});
 }
 
 export async function resetDb() {
-	const conn = await getConnection();
-	const tables = await conn.query(`SELECT relname AS "table"
-	FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
-	WHERE nspname NOT IN ('pg_catalog', 'information_schema')
-		AND C.relkind = 'r'
-		AND nspname !~ '^pg_toast';`);
-	await Promise.all(tables.map(t => t.table).map(x => conn.query(`DELETE FROM "${x}" CASCADE`)));
+	const reset = async () => {
+		const conn = await getConnection();
+		const tables = await conn.query(`SELECT relname AS "table"
+		FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+		WHERE nspname NOT IN ('pg_catalog', 'information_schema')
+			AND C.relkind = 'r'
+			AND nspname !~ '^pg_toast';`);
+		await Promise.all(tables.map(t => t.table).map(x => conn.query(`DELETE FROM "${x}" CASCADE`)));
+	};
+
+	for (let i = 1; i <= 3; i++) {
+		try {
+			await reset();
+		} catch (e) {
+			if (i === 3) {
+				throw e;
+			} else {
+				await new Promise(resolve => setTimeout(resolve, 1000));
+				continue;
+			}
+		}
+		break;
+	}
 }

@@ -7,7 +7,7 @@ import { MoreThan, Not, IsNull } from 'typeorm';
 
 const logger = queueLogger.createSubLogger('clean-remote-files');
 
-export default async function cleanRemoteFiles(job: Bull.Job<{}>, done: any): Promise<void> {
+export default async function cleanRemoteFiles(job: Bull.Job<Record<string, unknown>>, done: any): Promise<void> {
 	logger.info(`Deleting cached remote files...`);
 
 	let deletedCount = 0;
@@ -18,12 +18,12 @@ export default async function cleanRemoteFiles(job: Bull.Job<{}>, done: any): Pr
 			where: {
 				userHost: Not(IsNull()),
 				isLink: false,
-				...(cursor ? { id: MoreThan(cursor) } : {})
+				...(cursor ? { id: MoreThan(cursor) } : {}),
 			},
 			take: 8,
 			order: {
-				id: 1
-			}
+				id: 1,
+			},
 		});
 
 		if (files.length === 0) {

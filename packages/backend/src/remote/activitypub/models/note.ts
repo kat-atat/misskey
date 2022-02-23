@@ -75,10 +75,10 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 	if (err) {
 		logger.error(`${err.message}`, {
 			resolver: {
-				history: resolver.getHistory()
+				history: resolver.getHistory(),
 			},
 			value: value,
-			object: object
+			object: object,
 		});
 		throw new Error('invalid note');
 	}
@@ -169,16 +169,16 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 				if (res) {
 					return {
 						status: 'ok',
-						res
+						res,
 					};
 				} else {
 					return {
-						status: 'permerror'
+						status: 'permerror',
 					};
 				}
 			} catch (e) {
 				return {
-					status: (e instanceof StatusError && e.isClientError) ? 'permerror' : 'temperror'
+					status: (e instanceof StatusError && e.isClientError) ? 'permerror' : 'temperror',
 				};
 			}
 		};
@@ -250,7 +250,6 @@ export async function createNote(value: string | IObject, resolver?: Resolver, s
 		name: note.name,
 		cw,
 		text,
-		viaMobile: false,
 		localOnly: false,
 		visibility,
 		visibleUsers,
@@ -314,7 +313,7 @@ export async function extractEmojis(tags: IObject | IObject[], host: string): Pr
 
 		const exists = await Emojis.findOne({
 			host,
-			name
+			name,
 		});
 
 		if (exists) {
@@ -334,7 +333,7 @@ export async function extractEmojis(tags: IObject | IObject[], host: string): Pr
 
 				return await Emojis.findOne({
 					host,
-					name
+					name,
 				}) as Emoji;
 			}
 
@@ -350,7 +349,7 @@ export async function extractEmojis(tags: IObject | IObject[], host: string): Pr
 			uri: tag.id,
 			url: tag.icon!.url,
 			updatedAt: new Date(),
-			aliases: []
+			aliases: [],
 		} as Partial<Emoji>);
 	}));
 }

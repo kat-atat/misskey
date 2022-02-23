@@ -1,4 +1,4 @@
-import * as ms from 'ms';
+import ms from 'ms';
 import $ from 'cafy';
 import define from '../../define';
 import { Users, Followings } from '@/models/index';
@@ -15,13 +15,13 @@ export const meta = {
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		offset: {
 			validator: $.optional.num.min(0),
-			default: 0
-		}
+			default: 0,
+		},
 	},
 
 	res: {
@@ -31,7 +31,7 @@ export const meta = {
 			type: 'object' as const,
 			optional: false as const, nullable: false as const,
 			ref: 'User',
-		}
+		},
 	},
 };
 

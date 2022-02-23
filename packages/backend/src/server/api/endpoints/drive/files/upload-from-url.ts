@@ -1,6 +1,6 @@
 import $ from 'cafy';
 import { ID } from '@/misc/cafy-id';
-import * as ms from 'ms';
+import ms from 'ms';
 import uploadFromUrl from '@/services/drive/upload-from-url';
 import define from '../../../define';
 import { DriveFiles } from '@/models/index';
@@ -12,7 +12,7 @@ export const meta = {
 
 	limit: {
 		duration: ms('1hour'),
-		max: 60
+		max: 60,
 	},
 
 	requireCredential: true as const,
@@ -48,8 +48,8 @@ export const meta = {
 		force: {
 			validator: $.optional.bool,
 			default: false,
-		}
-	}
+		},
+	},
 };
 
 export default define(meta, async (ps, user) => {
@@ -57,7 +57,7 @@ export default define(meta, async (ps, user) => {
 		DriveFiles.pack(file, { self: true }).then(packedFile => {
 			publishMainStream(user.id, 'urlUploadFinished', {
 				marker: ps.marker,
-				file: packedFile
+				file: packedFile,
 			});
 		});
 	});

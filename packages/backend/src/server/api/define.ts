@@ -20,7 +20,7 @@ type SimpleUserInfo = {
 };
 
 type Params<T extends IEndpointMeta> = {
-	[P in keyof T['params']]: NonNullable<T['params']>[P]['transform'] extends Function
+	[P in keyof T['params']]: NonNullable<T['params']>[P]['transform'] extends () => any
 		? ReturnType<NonNullable<T['params']>[P]['transform']>
 		: NonNullable<T['params']>[P]['default'] extends null | number | string
 			? NonOptional<ReturnType<NonNullable<T['params']>[P]['validator']['get']>[0]>
@@ -30,7 +30,7 @@ type Params<T extends IEndpointMeta> = {
 export type Response = Record<string, any> | void;
 
 type executor<T extends IEndpointMeta> =
-	(params: Params<T>, user: T['requireCredential'] extends true ? SimpleUserInfo : SimpleUserInfo | null, token: AccessToken | null, file?: any, cleanup?: Function) =>
+	(params: Params<T>, user: T['requireCredential'] extends true ? SimpleUserInfo : SimpleUserInfo | null, token: AccessToken | null, file?: any, cleanup?: () => any) =>
 		Promise<T['res'] extends undefined ? Response : SchemaType<NonNullable<T['res']>>>;
 
 export default function <T extends IEndpointMeta>(meta: T, cb: executor<T>)
@@ -70,11 +70,11 @@ function getParams<T extends IEndpointMeta>(defs: T, params: any): [Params<T>, A
 				id: '3d81ceae-475f-4600-b2a8-2bc116157532',
 			}, {
 				param: k,
-				reason: e.message
+				reason: e.message,
 			});
 			return true;
 		} else {
-			if (v === undefined && def.hasOwnProperty('default')) {
+			if (v === undefined && Object.prototype.hasOwnProperty.call(def, 'default')) {
 				x[k] = def.default;
 			} else {
 				x[k] = v;

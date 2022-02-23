@@ -1,30 +1,27 @@
 <template>
 <header class="dehvdgxo">
-	<MkA class="name" :to="userPage(note.user)" v-user-preview="note.user.id">
+	<MkA v-user-preview="note.user.id" class="name" :to="userPage(note.user)">
 		<MkUserName :user="note.user"/>
 	</MkA>
-	<span class="is-bot" v-if="note.user.isBot">bot</span>
+	<span v-if="note.user.isBot" class="is-bot">bot</span>
 	<span class="username"><MkAcct :user="note.user"/></span>
-	<span class="admin" v-if="note.user.isAdmin"><i class="fas fa-bookmark"></i></span>
-	<span class="moderator" v-if="!note.user.isAdmin && note.user.isModerator"><i class="far fa-bookmark"></i></span>
 	<div class="info">
-		<span class="mobile" v-if="note.viaMobile"><i class="fas fa-mobile-alt"></i></span>
 		<MkA class="created-at" :to="notePage(note)">
 			<MkTime :time="note.createdAt"/>
 		</MkA>
-		<span class="visibility" v-if="note.visibility !== 'public'">
+		<span v-if="note.visibility !== 'public'" class="visibility">
 			<i v-if="note.visibility === 'home'" class="fas fa-home"></i>
 			<i v-else-if="note.visibility === 'followers'" class="fas fa-unlock"></i>
 			<i v-else-if="note.visibility === 'specified'" class="fas fa-envelope"></i>
 		</span>
-		<span class="localOnly" v-if="note.localOnly"><i class="fas fa-biohazard"></i></span>
+		<span v-if="note.localOnly" class="localOnly"><i class="fas fa-biohazard"></i></span>
 	</div>
 </header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import notePage from '@/filters/note';
+import { notePage } from '@/filters/note';
 import { userPage } from '@/filters/user';
 import * as os from '@/os';
 
@@ -80,12 +77,6 @@ export default defineComponent({
 		border-radius: 3px;
 	}
 
-	> .admin,
-	> .moderator {
-		margin-right: 0.5em;
-		color: var(--badge);
-	}
-
 	> .username {
 		margin: 0 .5em 0 0;
 		overflow: hidden;
@@ -95,10 +86,6 @@ export default defineComponent({
 	> .info {
 		font-size: 0.9em;
 		opacity: 0.7;
-
-		> .mobile {
-			margin-right: 8px;
-		}
 
 		> .visibility {
 			margin-left: 8px;

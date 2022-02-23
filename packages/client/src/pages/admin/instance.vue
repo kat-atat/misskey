@@ -106,11 +106,11 @@
 			<MkSwitch :model-value="isBlocked" class="switch" @update:modelValue="changeBlock">{{ $ts.blockThisInstance }}</MkSwitch>
 			<details>
 				<summary>{{ $ts.deleteAllFiles }}</summary>
-				<MkButton @click="deleteAllFiles()" style="margin: 0.5em 0 0.5em 0;"><i class="fas fa-trash-alt"></i> {{ $ts.deleteAllFiles }}</MkButton>
+				<MkButton style="margin: 0.5em 0 0.5em 0;" @click="deleteAllFiles()"><i class="fas fa-trash-alt"></i> {{ $ts.deleteAllFiles }}</MkButton>
 			</details>
 			<details>
 				<summary>{{ $ts.removeAllFollowing }}</summary>
-				<MkButton @click="removeAllFollowing()" style="margin: 0.5em 0 0.5em 0;"><i class="fas fa-minus-circle"></i> {{ $ts.removeAllFollowing }}</MkButton>
+				<MkButton style="margin: 0.5em 0 0.5em 0;" @click="removeAllFollowing()"><i class="fas fa-minus-circle"></i> {{ $ts.removeAllFollowing }}</MkButton>
 				<MkInfo warn>{{ $t('removeAllFollowingDescription', { host: instance.host }) }}</MkInfo>
 			</details>
 		</div>
@@ -125,7 +125,6 @@
 <script lang="ts">
 import { defineComponent, markRaw } from 'vue';
 import XModalWindow from '@/components/ui/modal-window.vue';
-import MkUsersDialog from '@/components/users-dialog.vue';
 import MkSelect from '@/components/form/select.vue';
 import MkButton from '@/components/ui/button.vue';
 import MkSwitch from '@/components/form/switch.vue';
@@ -201,44 +200,15 @@ export default defineComponent({
 		},
 
 		showFollowing() {
-			os.modal(MkUsersDialog, {
-				title: this.$ts.instanceFollowing,
-				pagination: {
-					endpoint: 'federation/following',
-					limit: 10,
-					params: {
-						host: this.instance.host
-					}
-				},
-				extract: item => item.follower
-			});
+			// TODO: ページ遷移
 		},
 
 		showFollowers() {
-			os.modal(MkUsersDialog, {
-				title: this.$ts.instanceFollowers,
-				pagination: {
-					endpoint: 'federation/followers',
-					limit: 10,
-					params: {
-						host: this.instance.host
-					}
-				},
-				extract: item => item.followee
-			});
+			// TODO: ページ遷移
 		},
 
 		showUsers() {
-			os.modal(MkUsersDialog, {
-				title: this.$ts.instanceUsers,
-				pagination: {
-					endpoint: 'federation/users',
-					limit: 10,
-					params: {
-						host: this.instance.host
-					}
-				}
-			});
+			// TODO: ページ遷移
 		},
 
 		bytes,

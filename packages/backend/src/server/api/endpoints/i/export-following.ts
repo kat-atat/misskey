@@ -1,6 +1,7 @@
+import $ from 'cafy';
 import define from '../../define';
 import { createExportFollowingJob } from '@/queue/index';
-import * as ms from 'ms';
+import ms from 'ms';
 
 export const meta = {
 	secure: true,
@@ -9,8 +10,18 @@ export const meta = {
 		duration: ms('1hour'),
 		max: 1,
 	},
+	params: {
+		excludeMuting: {
+			validator: $.optional.bool,
+			default: false,
+		},
+		excludeInactive: {
+			validator: $.optional.bool,
+			default: false,
+		},
+	},
 };
 
 export default define(meta, async (ps, user) => {
-	createExportFollowingJob(user);
+	createExportFollowingJob(user, ps.excludeMuting, ps.excludeInactive);
 });

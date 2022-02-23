@@ -4,7 +4,6 @@
 
 const fs = require('fs');
 const gulp = require('gulp');
-const rimraf = require('rimraf');
 const replace = require('gulp-replace');
 const terser = require('gulp-terser');
 const cssnano = require('gulp-cssnano');
@@ -58,6 +57,6 @@ gulp.task('default', gulp.task('build'));
 
 gulp.task('watch', () => {
 	gulp.watch([
-		'./packages/**/*',
+		'./packages/*/src/**/*',
 	], { ignoreInitial: false }, gulp.task('build'));
 });
