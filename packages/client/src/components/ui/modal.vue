@@ -72,7 +72,7 @@ export default defineComponent({
 		const zIndex = os.claimZIndex(props.front);
 		const type = computed(() => {
 			if (props.preferType === 'auto') {
-				if (isTouchUsing && window.innerWidth < 500 && window.innerHeight < 1000) {
+				if (isTouchUsing && window.innerWidth < 500 && window.innerHeight < 1000 && localStorage.getItem('ui') !== 'sunisky') {
 					return 'drawer';
 				} else {
 					return props.src != null ? 'popup' : 'dialog';
