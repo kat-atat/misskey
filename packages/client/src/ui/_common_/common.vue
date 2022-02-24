@@ -15,9 +15,10 @@
 
 <script lang="ts">
 import { defineAsyncComponent, defineComponent } from 'vue';
-import { stream, popup, popups, uploads, pendingApiRequestsCount } from '@/os';
+import { popup, popups, uploads, pendingApiRequestsCount } from '@/os';
 import * as sound from '@/scripts/sound';
 import { $i } from '@/account';
+import { stream } from '@/stream';
 
 export default defineComponent({
 	components: {
@@ -34,7 +35,7 @@ export default defineComponent({
 					id: notification.id
 				});
 
-				popup(import('@/components/toast.vue'), {
+				popup(import('@/components/notification-toast.vue'), {
 					notification
 				}, {}, 'closed');
 			}
@@ -60,7 +61,7 @@ export default defineComponent({
 #wait {
 	display: block;
 	position: fixed;
-	z-index: 10000;
+	z-index: 4000000;
 	top: 15px;
 	right: 15px;
 

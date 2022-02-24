@@ -138,6 +138,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'device',
 		default: false
 	},
+	disableDrawer: {
+		where: 'device',
+		default: false
+	},
 	useBlurEffectForModal: {
 		where: 'device',
 		default: true
@@ -177,6 +181,10 @@ export const defaultStore = markRaw(new Storage('base', {
 	reactionPickerHeight: {
 		where: 'device',
 		default: 1
+	},
+	reactionPickerUseDrawerForMobile: {
+		where: 'device',
+		default: true,
 	},
 	recentlyUsedEmojis: {
 		where: 'device',
@@ -237,7 +245,6 @@ export class ColdDeviceStorage {
 		lightTheme: require('@/themes/l-light.json5') as Theme,
 		darkTheme: require('@/themes/d-dark.json5') as Theme,
 		syncDeviceDarkMode: true,
-		chatOpenBehavior: 'page' as 'page' | 'window' | 'popout',
 		plugins: [] as Plugin[],
 		mediaVolume: 0.5,
 		sound_masterVolume: 0.3,
@@ -250,8 +257,6 @@ export class ColdDeviceStorage {
 		sound_channel: { type: 'syuilo/square-pico', volume: 1 },
 		sound_reversiPutBlack: { type: 'syuilo/kick', volume: 0.3 },
 		sound_reversiPutWhite: { type: 'syuilo/snare', volume: 0.3 },
-		roomGraphicsQuality: 'medium' as 'cheep' | 'low' | 'medium' | 'high' | 'ultra',
-		roomUseOrthographicCamera: true,
 	};
 
 	public static watchers = [];

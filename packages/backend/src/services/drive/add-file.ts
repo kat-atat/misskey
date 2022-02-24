@@ -20,6 +20,7 @@ import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error';
 import * as S3 from 'aws-sdk/clients/s3';
 import { getS3 } from './s3';
 import * as sharp from 'sharp';
+import { FILE_TYPE_BROWSERSAFE } from '@/const';
 
 const logger = driveLogger.createSubLogger('register', 'yellow');
 
@@ -47,6 +48,12 @@ async function save(file: DriveFile, path: string, name: string, type: string, h
 			if (type === 'image/webp') ext = '.webp';
 			if (type === 'image/apng') ext = '.apng';
 			if (type === 'image/vnd.mozilla.apng') ext = '.apng';
+		}
+
+		// 拡張子からContent-Typeを設定してそうな挙動を示すオブジェクトストレージ (upcloud?) も存在するので、
+		// 許可されているファイル形式でしか拡張子をつけない
+		if (!FILE_TYPE_BROWSERSAFE.includes(type)) {
+			ext = '';
 		}
 
 		const baseUrl = meta.objectStorageBaseUrl
@@ -160,7 +167,7 @@ export async function generateAlts(path: string, type: string, generateWeb: bool
 		}
 	}
 
-	if (!['image/jpeg', 'image/png', 'image/webp'].includes(type)) {
+	if (!['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'].includes(type)) {
 		logger.debug(`web image and thumbnail not created (not an required file)`);
 		return {
 			webpublic: null,
@@ -201,7 +208,7 @@ export async function generateAlts(path: string, type: string, generateWeb: bool
 				webpublic = await convertSharpToJpeg(img, 2048, 2048);
 			} else if (['image/webp'].includes(type)) {
 				webpublic = await convertSharpToWebp(img, 2048, 2048);
-			} else if (['image/png'].includes(type)) {
+			} else if (['image/png', 'image/svg+xml'].includes(type)) {
 				webpublic = await convertSharpToPng(img, 2048, 2048);
 			} else {
 				logger.debug(`web image not created (not an required image)`);
@@ -220,7 +227,7 @@ export async function generateAlts(path: string, type: string, generateWeb: bool
 	try {
 		if (['image/jpeg', 'image/webp'].includes(type)) {
 			thumbnail = await convertSharpToJpeg(img, 498, 280);
-		} else if (['image/png'].includes(type)) {
+		} else if (['image/png', 'image/svg+xml'].includes(type)) {
 			thumbnail = await convertSharpToPngOrJpeg(img, 498, 280);
 		} else {
 			logger.debug(`thumbnail not created (not an required file)`);
@@ -241,6 +248,7 @@ export async function generateAlts(path: string, type: string, generateWeb: bool
  */
 async function upload(key: string, stream: fs.ReadStream | Buffer, type: string, filename?: string) {
 	if (type === 'image/apng') type = 'image/png';
+	if (!FILE_TYPE_BROWSERSAFE.includes(type)) type = 'application/octet-stream';
 
 	const meta = await fetchMeta();
 

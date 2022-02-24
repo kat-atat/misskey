@@ -7,8 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
+import { computed, defineComponent } from 'vue';
 import XColumn from './column.vue';
 import XNotes from '@/components/notes.vue';
 import * as os from '@/os';
@@ -35,21 +34,11 @@ export default defineComponent({
 			pagination: {
 				endpoint: 'notes/mentions',
 				limit: 10,
-				params: () => ({
+				params: computed(() => ({
 					visibility: 'specified'
-				})
+				})),
 			},
 		}
 	},
-
-	methods: {
-		before() {
-			Progress.start();
-		},
-
-		after() {
-			Progress.done();
-		}
-	}
 });
 </script>

@@ -1,14 +1,13 @@
 <template>
 <div class="_section">
 	<div class="_content">
-		<XNotes ref="notes" :pagination="pagination" @before="before" @after="after"/>
+		<XNotes ref="notes" :pagination="pagination"/>
 	</div>
 </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
 import XNotes from '@/components/notes.vue';
 import * as symbols from '@/symbols';
 
@@ -26,28 +25,12 @@ export default defineComponent({
 			pagination: {
 				endpoint: 'notes/search',
 				limit: 10,
-				params: () => ({
+				params: computed(() => ({
 					query: this.$route.query.q,
 					channelId: this.$route.query.channel,
-				})
+				}))
 			},
 		};
 	},
-
-	watch: {
-		$route() {
-			(this.$refs.notes as any).reload();
-		}
-	},
-
-	methods: {
-		before() {
-			Progress.start();
-		},
-
-		after() {
-			Progress.done();
-		}
-	}
 });
 </script>

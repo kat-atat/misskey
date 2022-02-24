@@ -1,7 +1,7 @@
 <template>
 <transition :name="$store.state.animation ? (type === 'drawer') ? 'modal-drawer' : (type === 'popup') ? 'modal-popup' : 'modal' : ''" :duration="$store.state.animation ? 200 : 0" appear @after-leave="$emit('closed')" @enter="$emit('opening')" @after-enter="childRendered">
 	<div v-show="manualShowing != null ? manualShowing : showing" v-hotkey.global="keymap" class="qzhlnise" :class="{ drawer: type === 'drawer', dialog: type === 'dialog' || type === 'dialog:top', popup: type === 'popup' }" :style="{ zIndex, pointerEvents: (manualShowing != null ? manualShowing : showing) ? 'auto' : 'none', '--transformOrigin': transformOrigin }">
-		<div class="bg _modalBg" :style="{ zIndex }" @click="onBgClick" @contextmenu.prevent.stop="() => {}"></div>
+		<div class="bg _modalBg" :class="{ transparent: transparentBg && (type === 'popup') }" :style="{ zIndex }" @click="onBgClick" @contextmenu.prevent.stop="() => {}"></div>
 		<div ref="content" class="content" :class="{ fixed, top: type === 'dialog:top' }" :style="{ zIndex }" @click.self="onBgClick">
 			<slot :max-height="maxHeight" :type="type"></slot>
 		</div>
@@ -13,6 +13,7 @@
 import { defineComponent, nextTick, onMounted, computed, PropType, ref, watch } from 'vue';
 import * as os from '@/os';
 import { isTouchUsing } from '@/scripts/touch';
+import { defaultStore } from '@/store';
 
 function getFixedContainer(el: Element | null): Element | null {
 	if (el == null || el.tagName === 'BODY') return null;
@@ -49,15 +50,20 @@ export default defineComponent({
 			type: String,
 			default: 'auto',
 		},
-		front: {
-			type: Boolean,
+		zPriority: {
+			type: String as PropType<'low' | 'middle' | 'high'>,
 			required: false,
-			default: false,
+			default: 'low',
 		},
 		noOverlap: {
 			type: Boolean,
 			required: false,
 			default: true,
+		},
+		transparentBg: {
+			type: Boolean,
+			required: false,
+			default: false,
 		},
 	},
 
@@ -69,10 +75,10 @@ export default defineComponent({
 		const transformOrigin = ref('center');
 		const showing = ref(true);
 		const content = ref<HTMLElement>();
-		const zIndex = os.claimZIndex(props.front);
+		const zIndex = os.claimZIndex(props.zPriority);
 		const type = computed(() => {
 			if (props.preferType === 'auto') {
-				if (isTouchUsing && window.innerWidth < 500 && window.innerHeight < 1000 && localStorage.getItem('ui') !== 'sunisky') {
+				if (!defaultStore.state.disableDrawer && isTouchUsing && window.innerWidth < 500 && window.innerHeight < 1000) {
 					return 'drawer';
 				} else {
 					return props.src != null ? 'popup' : 'dialog';
@@ -97,7 +103,7 @@ export default defineComponent({
 		};
 
 		if (type.value === 'drawer') {
-			maxHeight.value = 300;
+			maxHeight.value = window.innerHeight / 2;
 		}
 
 		const keymap = {
@@ -327,6 +333,14 @@ export default defineComponent({
 }
 
 .qzhlnise {
+	> .bg {
+		&.transparent {
+			background: transparent;
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+
 	&.dialog {
 		> .content {
 			position: fixed;
