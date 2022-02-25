@@ -1,5 +1,5 @@
 <template>
-<MkSpacer :content-max="800">
+<MkSpacer :content-max="800" :margin-max="0">
 	<div v-hotkey.global="keymap" class="cmuxhskf">
 		<XTutorial v-if="$store.reactiveState.tutorial.value != -1" class="tutorial _block"/>
 		<XPostForm v-if="$store.reactiveState.showFixedPostForm.value" class="post-form _block" fixed/>
