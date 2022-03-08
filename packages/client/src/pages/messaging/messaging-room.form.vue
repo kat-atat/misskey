@@ -76,8 +76,7 @@ export default defineComponent({
 		autosize(this.$refs.text);
 
 		// TODO: detach when unmount
-		// TODO
-		//new Autocomplete(this.$refs.text, this, { model: 'text' });
+		new Autocomplete(this.$refs.text, this, { model: 'text' });
 
 		// 書きかけの投稿を復元
 		const draft = JSON.parse(localStorage.getItem('message_drafts') || '{}')[this.draftKey];
